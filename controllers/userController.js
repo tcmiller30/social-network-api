@@ -40,8 +40,8 @@ const userController = {
         try{
             // Request body should look like this...
             // {
-                // "username": "lernantino",
-                // "email": "lernantino@gmail"
+                // "username": "billyPilgrim",
+                // "email": "pooteeweet@gmail.com"
             // }
             const userData = await User.create(req.body);
             res.json(userData);
