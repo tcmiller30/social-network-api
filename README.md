@@ -59,6 +59,8 @@ In Insomnia, using the base URL of `http://localhost:3001/api`, the user can tes
 *`/thoughts/:thoughtId/reactions/:reactionId`
     - DELETE to pull and remove a reaction by the reaction's reactionId value
 
+## Walkthrough Video
+You can view a walkthrough video of the application [here](https://drive.google.com/file/d/13sInYdjs9szs_eEidzVNVPtY1WgTTP8e/view?usp=sharing).
 
 ## License
 
