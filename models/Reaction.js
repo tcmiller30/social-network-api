@@ -6,11 +6,6 @@ const reactionSchema = new Schema(
             type: Schema.Types.ObjectId,
             default: () => new Types.ObjectId()
         },
-        reactionBody: {
-            type: String,
-            required: 'Please enter a reaction.',
-            maxlength: 280
-        },
         username: {
             type: String,
             required: 'Please enter a username.'
@@ -18,7 +13,7 @@ const reactionSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            // get: (createdAtVal) => dateFormat(createdAtVal)
+            get: createdAtVal => createdAtVal.toLocaleString()
         }
     },
     {

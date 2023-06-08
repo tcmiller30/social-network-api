@@ -100,6 +100,48 @@ const thoughtController = {
             console.log(err);
             res.status(500).json(err);
         }
+    },
+    // Create a reaction
+    // Request body should look like this...
+    // {
+    //     "reactionBody": "So it goes...",
+    //     "username": "billyPilgrim"
+    // }
+    async createReaction(req, res) {
+        try{
+            const reactionData = await Thought.findOneAndUpdate(
+                { _id: req.params.thoughtId },
+                { $push: { reactions: req.body } },
+                { new: true }
+            );
+            if(!reactionData) {
+                return res.status(404).json({ message: 'Thought not found.' });
+            }
+            res.json(reactionData);
+        }
+        catch(err){
+            console.log(err);
+            res.status(500).json(err);
+        }
+    },
+
+    // Delete a reaction
+    async deleteReaction(req, res) {
+        try{
+            const reactionData = await Thought.findOneAndUpdate(
+                { _id: req.params.thoughtId },
+                { $pull: { reactions: { reactionId: req.params.reactionId } } },
+                { new: true }
+            );
+            if(!reactionData) {
+                return res.status(404).json({ message: 'Thought not found.' });
+            }
+            res.json(reactionData);
+        }
+        catch(err){
+            console.log(err);
+            res.status(500).json(err);
+        }
     }
 };
 

@@ -19,10 +19,10 @@ const userController = {
     // Get a single User by ID
     async getSingleUser(req, res) {
         try{
-            const userData = await User.findOne({ _id: req.params.id })
+            const userData = await User.findOne({ _id: req.params.userId })
                 .select('-__v')
                 .populate('friends')
-                // .populate('thoughts')
+                .populate('thoughts')
 
             if(!userData) {
                 return res.status(404).json({ message: 'User not found.' });
@@ -56,7 +56,7 @@ const userController = {
     async updateUser(req, res) {
         try{
             const userData = await User.findOneAndUpdate(
-                { _id: req.params.id },
+                { _id: req.params.userId },
                 { $set: req.body, },
                 { new: true, runValidators: true }
             );
@@ -71,14 +71,16 @@ const userController = {
         }
     },
 
-    // Delete a User by ID
+    // Delete a User by ID and remove their associated thoughts
     async deleteUser(req, res) {
         try{
-            const userData = await User.findOneAndDelete({ _id: req.params.id });
+            const userData = await User.findOneAndDelete({ _id: req.params.userId });
             if(!userData) {
-                return res.status(500).json({ message: 'User not found.' });
+                return res.status(404).json({ message: 'User not found.' });
             }
-            res.json('User deleted successfully.');
+            // Remove the user's associated thoughts
+            const thoughtData = await Thought.deleteMany({ username: userData.username });
+            res.json(userData);
         }
         catch(err){
             console.log(err);
@@ -86,18 +88,25 @@ const userController = {
         }
     },
 
-    // Add a friend to a User's friend list
+    // Add a friend to a User's friend list and add the User to the friend's friend list
     async addFriend(req, res) {
         try{
             const userData = await User.findOneAndUpdate(
-                { _id: req.params.id },
-                { $addToSet: { friends: req.params.friendId } },
+                { _id: req.params.userId },
+                { $push: { friends: req.params.friendId } },
                 { new: true, runValidators: true });
-
             if(!userData) {
                 return res.status(404).json({ message: 'User not found.' });
             }
-            res.json(userData);
+            // Add the User to the friend's friend list
+            const friendData = await User.findOneAndUpdate(
+                { _id: req.params.friendId },
+                { $push: { friends: req.params.userId } },
+                { new: true, runValidators: true });
+            if(!friendData) {
+                return res.status(404).json({ message: 'Friend not found.' });
+            }
+            res.json(userData, friendData);
         }
         catch(err){
             console.log(err);
@@ -108,7 +117,7 @@ const userController = {
     async removeFriend(req, res) {
         try{
             const userData = await User.findOneAndUpdate(
-                { _id: req.params.id },
+                { _id: req.params.userId },
                 { $pull: { friends: req.params.friendId } },
                 { new: true, runValidators: true });
             if(!userData) {
